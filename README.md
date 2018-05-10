@@ -19,7 +19,7 @@ laser.normalized <- normalize(laser, 'peak', peak.range=c(404,405.15)) # Makes i
 See more description in the file.
 
 
-## straightline.R
+## `straightline.R`
 
 The values in given data are replaced by straight line. 
 This is one of ways that cosmic particles cotribution in Raman/SERS spectra usually handled.
