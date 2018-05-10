@@ -25,6 +25,7 @@ The values in given data are replaced by straight line.
 This is one of ways that cosmic particles cotribution in Raman/SERS spectra usually handled.
 
 **Usage**
+
 Pretend we need to replace range between 900 and 1100 for the first ten spectra.
 ```{r}
 # library(hyperSpec)
