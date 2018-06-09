@@ -5,7 +5,6 @@ using namespace Rcpp;
 // - parallel
 // - matrix
 
-// [[Rcpp::export]]
 double vector_min(const NumericVector x, const int start, const int end) {
   int i = 0;
   double smallest = x[start];
@@ -20,7 +19,6 @@ double vector_min(const NumericVector x, const int start, const int end) {
   return smallest;
 }
 
-// [[Rcpp::export]]
 double vector_max(const NumericVector x, const int start, const int end) {
   int i = 0;
   double biggest = x[start];
