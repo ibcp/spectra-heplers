@@ -1,11 +1,7 @@
 #include <Rcpp.h>
-// #include <algorithm>
 using namespace Rcpp;
 
 // TODO:
-// - Handle NA's. Use std::isnan
-// - Moving window min/max.
-// - I-MOR
 // - parallel
 // - matrix
 
@@ -39,23 +35,28 @@ double vector_max(const NumericVector x, const int start, const int end) {
   return biggest;
 }
 
+// This function is simpy moving window min
 // [[Rcpp::export]]
-NumericVector mor_erosion(const NumericVector x,
-                                const int w) {
+NumericVector mor_erosion(const NumericVector x, const int w) {
   int n = x.size();
   NumericVector newx(n);
   unsigned long int w_start, w_end;
   
   
   for (int i = 0; i < n; i++) {
-    w_start = ((i - w) < 0) ? 0 : i-w;
-    w_end   = ((i + w) >= n) ? n-1 : i + w;
-    newx[i] = vector_min(x, w_start, w_end);
+    if (NumericVector::is_na(x[i])) {
+      newx[i] = NA_REAL;
+    } else {
+      w_start = ((i - w) < 0) ? 0 : i-w;
+      w_end   = ((i + w) >= n) ? n-1 : i + w;
+      newx[i] = vector_min(x, w_start, w_end);
+    }
   }
   
   return newx;
 }
 
+// This function is simpy moving window max
 // [[Rcpp::export]]
 NumericVector mor_dilation(const NumericVector x, const int w) {
   int n = x.size();
@@ -64,9 +65,13 @@ NumericVector mor_dilation(const NumericVector x, const int w) {
   
   
   for (int i = 0; i < n; i++) {
-    w_start = ((i - w) < 0) ? 0 : i-w;
-    w_end   = ((i + w) > n) ? x.size() : i + w;
-    newx[i] = vector_max(x, w_start, w_end);
+    if (NumericVector::is_na(x[i])) {
+      newx[i] = NA_REAL;
+    } else {
+      w_start = ((i - w) < 0) ? 0 : i-w;
+      w_end   = ((i + w) >= n) ? n-1 : i + w;
+      newx[i] = vector_max(x, w_start, w_end);
+    }
   }
   
   return newx;
@@ -82,6 +87,7 @@ NumericVector mor_P(const NumericVector x, const int w) {
   return 0.5*(mor_erosion(mor_opening(x,w),w) + mor_dilation(mor_opening(x,w),w));
 }
 
+// Min of mor_P and original x
 // [[Rcpp::export]]
 NumericVector baseline_mor(const NumericVector x, const int w) {
   int n = x.size();
@@ -94,44 +100,41 @@ NumericVector baseline_mor(const NumericVector x, const int w) {
   return bl;
 }
 
-/*
-# =============== ITERATIVE Mor =============================
-# Adaptively determine the optimal structuring element size
- mor.getwopt <- function(spc,wstart=20) {
-wopts <- rep(NA,nrow(spc))
-for (i in 1:nrow(spc)) {
-s <- spc[i,,drop=FALSE]
-w <- wstart
-O <- mor.opening(s,w)
-diff <- Inf
-while(diff > 0.1) {
-prevO <- O
-w <- w+1
-O <- mor.opening(s,w)
-diff <- sum(abs(O-prevO))
+// =============== ITERATIVE Mor =============================
+// Adaptively determine the optimal structuring element size
+// [[Rcpp::export]]
+unsigned int mor_getwopt(NumericVector x, const unsigned int wstart=10) {
+  
+  unsigned int w = wstart;
+  int n = x.size();
+  NumericVector old_opening(n);
+  NumericVector new_opening = mor_opening(x, w);
+  double diff = 10000;
+  
+  while (diff > 0) {
+    w++;
+    old_opening = new_opening;
+    new_opening = mor_opening(x, w);
+    diff = sum(abs(new_opening-old_opening));
+  }
+  
+  return w-1;
 }
-wopts[i] <- w
-}
-return(wopts)
- }
 
-# Estimate the baseline based on iterative morphological operations
-baseline.imor <- function(spc, tol=0.0001) {
-imor <- spc
-wopt <- mor.getwopt(spc)
-for (i in 1:nrow(spc)) {
-s <- spc[i,,drop=F]
-P <- mor.P(s, wopt[i])
-b <- pmin(P, s)
-RD <- sum((b-s)*(b-s))/sum(s*s)
-while(RD > tol) {
-newb <- pmin(mor.P(b, wopt[i]), s)
-RD <- sum((newb-b)*(newb-b))/sum(b*b)
-b <- newb
+// Estimate the baseline based on iterative morphological operations
+// [[Rcpp::export]]
+NumericVector baseline_imor(const NumericVector x, const double tol=0.0001){
+  unsigned int w = mor_getwopt(x);
+  NumericVector b = x;
+  NumericVector b_new = pmin(mor_P(b, w),x);
+  double rd = sum((b_new-b)*(b_new-b)) / sum(b*b);
+  
+  while(rd > tol) {
+    std::copy( b_new.begin(), b_new.end(), b.begin() ); // b = b_new;
+    b_new = pmin(mor_P(b, w), x);
+    rd = sum((b_new-b)*(b_new-b)) / sum(b*b);
+  }
+  return b_new;
 }
-imor[i,] <- b
-}
-return(imor)
-}
- */
+
 
