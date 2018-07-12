@@ -101,6 +101,6 @@ plotspc(res)
 ```
 See more description in the file.
 
-[bl_correction_comparation]: https://github.com/rguliev/spectra-heplers/blob/master/baseline/tests_benchmarks_experiments/compare_all_methods.png
-[bl_correction_comparation_zoom]: https://github.com/rguliev/spectra-heplers/blob/master/baseline/tests_benchmarks_experiments/compare_all_methods(1600-2300).png	
-[bl_correction_comparation_speed]:  https://github.com/rguliev/spectra-heplers/blob/master/baseline/tests_benchmarks_experiments/compare_all_methods_speed.png	
+[bl_correction_comparation]: https://github.com/rguliev/spectra-heplers/blob/master/baseline/supplementary/compare_all_methods.png
+[bl_correction_comparation_zoom]: https://github.com/rguliev/spectra-heplers/blob/master/baseline/supplementary/compare_all_methods(1600-2300).png	
+[bl_correction_comparation_speed]:  https://github.com/rguliev/spectra-heplers/blob/master/baseline/supplementary/compare_all_methods_speed.png	
