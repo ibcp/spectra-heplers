@@ -1,10 +1,6 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-// TODO:
-// - parallel
-// - matrix
-
 double vector_min(const NumericVector x, const int start, const int end) {
   int i = 0;
   double smallest = x[start];
@@ -34,7 +30,6 @@ double vector_max(const NumericVector x, const int start, const int end) {
 }
 
 // This function is simpy moving window min
-// [[Rcpp::export]]
 NumericVector mor_erosion(const NumericVector x, const int w) {
   int n = x.size();
   NumericVector newx(n);
@@ -55,7 +50,6 @@ NumericVector mor_erosion(const NumericVector x, const int w) {
 }
 
 // This function is simpy moving window max
-// [[Rcpp::export]]
 NumericVector mor_dilation(const NumericVector x, const int w) {
   int n = x.size();
   NumericVector newx(n);
@@ -75,19 +69,17 @@ NumericVector mor_dilation(const NumericVector x, const int w) {
   return newx;
 }
 
-// [[Rcpp::export]]
 NumericVector mor_opening(const NumericVector x, const int w) {
   return mor_dilation(mor_erosion(x,w),w);
 }
 
-// [[Rcpp::export]]
 NumericVector mor_P(const NumericVector x, const int w) {
   return 0.5*(mor_erosion(mor_opening(x,w),w) + mor_dilation(mor_opening(x,w),w));
 }
 
 // Min of mor_P and original x
 // [[Rcpp::export]]
-NumericVector baseline_mor(const NumericVector x, const int w) {
+NumericVector baseline_mor_cpp(const NumericVector x, const int w) {
   int n = x.size();
   NumericVector bl = mor_P(x, w);
   for(int i=0;i<n;i++){
@@ -121,9 +113,10 @@ unsigned int mor_getwopt(NumericVector x, const unsigned int wstart=10) {
 
 // Estimate the baseline based on iterative morphological operations
 // [[Rcpp::export]]
-NumericVector baseline_imor(const NumericVector x, const double tol=0.0001){
+NumericVector baseline_imor_cpp(const NumericVector x, const double tol=0.0001){
   unsigned int w = mor_getwopt(x);
-  NumericVector b = x;
+  NumericVector b(x.size());
+  std::copy( x.begin(), x.end(), b.begin() ); // b = x;
   NumericVector b_new = pmin(mor_P(b, w),x);
   double rd = sum((b_new-b)*(b_new-b)) / sum(b*b);
   
@@ -134,5 +127,4 @@ NumericVector baseline_imor(const NumericVector x, const double tol=0.0001){
   }
   return b_new;
 }
-
 
