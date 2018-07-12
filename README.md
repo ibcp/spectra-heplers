@@ -1,8 +1,35 @@
 # spectra-heplers
 
-Set of useful tools for processing Raman / SERS / IR or other similar spectra.
+Set of useful tools for processing vibrational (Raman / SERS / IR) or other similar spectra.
 
-**NOTE: For now it's raw and messy repo. Some functions use hyperSpec as input, some use matrix.**
+## Baseline correction
+
+### `baseline.mor.R` and `baseline.imor.R`
+A method based on morphological operations (MOR) and fully automated method based on iterative morphological operations (I-MOR). I-MOR shows good results for "realworld" spectra. However, the output baseline has stairs-like shape which can harm spectral information.
+
+**References:**
+
+- Liankui Dai and YunliangChen. *EXPRESS: An automated baseline correction method based on iterative morphological operations.* DOI:10.1177/0003702817752371
+
+### `baseline.Goldinec.R`
+Goldindec semiautomated baseline correction method based on regression with cost fucntion. The code of the function is optimized and transformed version of original Matlab code (see refs.). The function has been tested to give the same output as original Matlab code. 
+
+However, on "real world" spectra the method does not perform much better that just polynom. 
+
+**References:**
+
+- Juntao Liu, Jianyang Sun, Xiuzhen Huang, Guojun Li, Binqiang Liu. *Goldindec: A Novel Algorithm for Raman Spectrum Baseline Correction.* DOI:10.1366/14-07798
+- https://sourceforge.net/projects/transcriptomeassembly/files/Baseline_Correction/Goldindec.rar/
+
+### `baseline.wavelet.R` 
+This is simple wrap around original code (see refs.) to make baseline coorection done by one command. The method shows good results as well. However, there are about 8 parameters must be set. So, the method is far away from automatic baseline correction.
+
+**References:**
+
+- Z.M. Zhang, S. Chen, Y.Z. Liang, et al., An intelligent background-correction algorithm for highly fluorescent samples in Raman spectroscopy. Journal of Raman Spectroscopy 41 (6), 659 (2010).
+- Original repo: https://github.com/zmzhang/baselineWavelet
+
+### `baseline.anchor.R`
 
 # Finished functions:
 ## `normalize.R` 
