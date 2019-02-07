@@ -62,7 +62,14 @@ pclda <- function(x, y, PCs, center=TRUE, scale=FALSE, prior=NULL) {
 }
 
 predict.pclda <- function(object, newdata, prior = object$prior) {
-  
+  if (is.null(dim(newdata))) {
+    dim(newdata) <- c(1L, length(newdata))
+    newdata <- as.matrix(newdata)
+  }
+  if (ncol(newdata) != ncol(object$means)) 
+    stop("wrong number of variables")
+  if (length(colnames(newdata)) > 0L && any(colnames(newdata) != dimnames(object$means)[[2L]])) 
+    warning("variable names in 'newdata' do not match those in 'object'")
   ng <- length(object$prior)
   if (!missing(prior)) {
     if (any(prior < 0) || round(sum(prior), 5) != 1) 
