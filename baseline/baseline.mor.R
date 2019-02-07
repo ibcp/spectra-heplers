@@ -1,4 +1,5 @@
-Rcpp::sourceCpp('baseline/baseline.mor.cpp')
+# TODO: Use R version if Rcpp is not available
+Rcpp::sourceCpp('baseline/mor.cpp')
 
 ##' An automated baseline correction method based on iterative morphological operations.
 ##' 
